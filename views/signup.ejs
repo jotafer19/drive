@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up</title>
+</head>
+<body>
+    <form action="/signup" method="POST">
+        <label for="username">Username</label>
+        <input type="text" name="username" id="username" value="<%= locals.oldInput ? locals.oldInput.username : "" %>">
+        <%- include("partials/form-error", { errors: locals.errors, pathName: "username" }) %>
+        <label for="email">Email</label>
+        <input type="email" name="email" id="email" value="<%= locals.oldInput ? locals.oldInput.email : "" %>">
+        <%- include("partials/form-error", {errors: locals.errors, pathName: "email"}) %>
+        <label for="password">Password</label>
+        <input type="password" name="password" id="password">
+        <%- include("partials/form-error", { errors: locals.errors, pathName: "password"}) %>
+        <label for="confirmPassword">Confirm Password</label>
+        <input type="password" name="confirmPassword" id="confirmPassword">
+        <%- include("partials/form-error", { errors: locals.errors, pathName: "confirmPassword"}) %>
+        <button type="submit">Sign Up</button>
+    </form>
+    <div>
+        <p>Already have an account? <a href="/login">Login</a></p>
+    </div>
+</body>
+</html>

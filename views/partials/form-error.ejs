@@ -1,0 +1,9 @@
+<% if (locals.errors && locals.errors.find(error => error.path === locals.pathName)) { %>
+    <% if (locals.pathName === "password") { %>
+        <% locals.errors.filter(error => error.path === locals.pathName).forEach(error => { %>
+            <span><%= error.msg %></span>
+        <% }) %>
+    <% } else { %>
+        <span><%= locals.errors.find(error => error.path === locals.pathName).msg %></span>
+    <% } %>
+<% } %>
