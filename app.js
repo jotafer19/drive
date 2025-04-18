@@ -59,7 +59,7 @@ async function main() {
 
 main()
 
-app.get("/", homeRouter)
+app.use("/", homeRouter)
 app.use("/login", loginRouter)
 app.use("/signup", signupRouter)
 app.use("/logout", logoutRouter)

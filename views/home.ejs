@@ -6,10 +6,14 @@
     <title>Document</title>
 </head>
 <body>
-    <h1>Hello World</h1>
-    <% if (currentUser) { %>
+    <p>Hello world</p>
+    <% if (locals.currentUser) { %>
         <p><%= currentUser.username %></p>
     <% } %>
-    <a href="/logout">Logout</a>
+    <form action="/" method="post">
+        <input type="file" name="file" id="file">
+        <button type="submit">Submit</button>
+    </form>
+    <a href="/logout">Log Out</a>
 </body>
 </html>
