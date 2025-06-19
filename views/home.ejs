@@ -68,7 +68,7 @@
                                         <img src="/svg/dropdown-icon.svg" alt="Dropdown icon">
                                     </button>
                                     <ul class="dropdown-menu">
-                                        <li class="dropdown-item"><button class="dropdown-option" onclick="showModal({id: '<%= file.id %>', name: '<%= file.name %>', size: '<%= file.size %>', createdAt: '<%= file.createdAt %>', updatedAt: '<%= file.updatedAt %>', action: 'info', type: 'file' })">Info</button></li>
+                                        <li class="dropdown-item"><button class="dropdown-option" onclick="showModal({id: '<%= file.id %>', name: '<%= file.name %>', size: '<%= file.size %>', archive: '<%= file.type %>' , createdAt: '<%= file.createdAt %>', updatedAt: '<%= file.updatedAt %>', action: 'info', type: 'file' })">Info</button></li>
                                         <li class="dropdown-item"><button class="dropdown-option" onclick="showModal({ id: '<%= file.id %>', name: '<%= file.name %>', action: 'edit', type: 'file' })">Edit</button></li>
                                         <li class="dropdown-item"><a class="dropdown-option" href="/uploads/file/<%= file.id %>/download">Download</a></li>
                                         <li class="dropdown-item"><a class="dropdown-option" href="/uploads/file/<%= file.id %>/delete">Delete</a></li>
@@ -104,6 +104,14 @@
                     type: "<%= editTarget.type %>",
                     error: "<%= editError %>"
                 })
+            })
+        </script>
+    <% } %>
+
+    <% if (fileError) { %>
+        <script>
+            document.addEventListener("DOMContentLoaded", () => {
+                newFile("<%= parentFolder ? parentFolder.id : null %>", "<%= fileError %>")
             })
         </script>
     <% } %>
@@ -235,8 +243,9 @@
         const updatedAtDate = formatDate(data.updatedAt)
         
         if (data.type === "file") {
+            const archive = infoTab("Type: ", data.archive)
             const sizeInfo = infoTab("Size: ", formatFileSize(Number(data.size)))
-            infoToDisplay.push(sizeInfo)
+            infoToDisplay.push(archive, sizeInfo)
         }
         
         const createdInfo = infoTab("Created at: ", createdAtDate)
@@ -288,15 +297,15 @@
         formItem.append(label, input)
         form.append(formItem)
 
-            if (data.error) {
-        const error = document.createElement("p");
-        error.classList.add("error-message");
-        error.style.color = "red";
-        error.style.marginTop = "0.5rem";
-        error.style.fontSize = "0.9rem";
-        error.textContent = data.error;
-        form.append(error);
-    }
+        if (data.error) {
+            const error = document.createElement("p");
+            error.classList.add("error-message");
+            error.style.color = "red";
+            error.style.marginTop = "0.5rem";
+            error.style.fontSize = "0.9rem";
+            error.textContent = data.error;
+            form.append(error);
+        }
 
         form.append(button)
         modalContent.append(form)
@@ -353,7 +362,7 @@
         }, 0)
     }
 
-    const newFile = (parentFolder) => {
+    const newFile = (parentFolder, errorMessage="") => {
         modal.style.display = "flex"
 
         const form = document.createElement("form")
@@ -367,12 +376,21 @@
         input.type = "file"        
         input.name = "file"
 
+        const error = document.createElement("p");
+        error.classList.add("error-message");
+        error.style.color = "red";
+        error.style.marginTop = "0.5rem";
+        error.style.fontSize = "0.9rem";
+        error.textContent = errorMessage;
+
         const button = document.createElement("button")
         button.classList.add("btn", "submit-btn")
         button.type = "submit"
         button.textContent = "Add file"
 
-        form.append(input, button)
+        form.append(input)
+        if (errorMessage) form.append(error)
+        form.append(button)
         modalContent.append(form)
     }
 
