@@ -1,0 +1,17 @@
+<header class="header">
+    <div class="logo">
+        <h1><a class="link" href="/">myDrive</a></h1>
+    </div>
+    <navbar class="navbar">
+        <% if (!locals.currentUser) { %>
+            <a class="link link-button" href="/">Login</a>
+            <a class="link link-button" href="/signup">Sign Up</a>
+        <% } else { %>
+                
+                <a class="link link-button navbar-opt" href="/logout">
+                    <img src="/svg/logout-icon.svg" alt="Logout icon">
+                    <p>Logout</p>
+                </a>
+        <% } %>
+    </navbar>
+</header>

@@ -3,19 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/style/style.css">
     <title>Login</title>
 </head>
 <body>
-    <form action="/login" method="POST">
-        <label for="email">Email</label>
-        <input type="email" name="email" id="email">
-        <% console.log(locals.flashMessage) %>
-        <label for="password">Password</label>
-        <input type="password" name="password" id="password">
-        <button type="submit">Login</button>
-    </form>
-    <div>
-        <p>Don't have an account? <a href="/signup">Sign Up</a></p>
+    <%- include("partials/header") %>
+    <div class="container form-container">
+        <h1 class="title">Login</h1>
+        <form action="/" method="POST" class="login-form form">
+            <div class="form-item">
+                <label class="input-label for="email">Email</label>
+                <input class="input input-form" type="email" name="email" id="email">
+            </div>
+            <div class="form-item">
+                <label class="input-label for="password">Password</label>
+                <input class="input input-form" type="password" name="password" id="password">
+                <% if (locals.flashMessage) { %>
+                    <span class="error msg"><%= flashMessage.error %></span>
+                <% } %>
+            </div>
+            <button class="btn submit-btn" type="submit">Login</button>
+        </form>
+        <div>
+            <p>Don't have an account? <a class="link" href="/signup">Sign Up</a></p>
+        </div>
     </div>
 </body>
 </html>

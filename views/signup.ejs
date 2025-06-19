@@ -3,26 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sign Up</title>
+    <link rel="stylesheet" href="/style/style.css">
+    <title>Sign up</title>
 </head>
 <body>
-    <form action="/signup" method="POST">
-        <label for="username">Username</label>
-        <input type="text" name="username" id="username" value="<%= locals.oldInput ? locals.oldInput.username : "" %>">
-        <%- include("partials/form-error", { errors: locals.errors, pathName: "username" }) %>
-        <label for="email">Email</label>
-        <input type="email" name="email" id="email" value="<%= locals.oldInput ? locals.oldInput.email : "" %>">
-        <%- include("partials/form-error", {errors: locals.errors, pathName: "email"}) %>
-        <label for="password">Password</label>
-        <input type="password" name="password" id="password">
-        <%- include("partials/form-error", { errors: locals.errors, pathName: "password"}) %>
-        <label for="confirmPassword">Confirm Password</label>
-        <input type="password" name="confirmPassword" id="confirmPassword">
-        <%- include("partials/form-error", { errors: locals.errors, pathName: "confirmPassword"}) %>
-        <button type="submit">Sign Up</button>
-    </form>
-    <div>
-        <p>Already have an account? <a href="/login">Login</a></p>
+    <%- include("partials/header") %>
+    <div class="container form-container">
+        <h1 class="title">Sign up</h1>
+        <form action="/signup" method="POST" class="signup-form form">
+            <div class="form-item">
+                <label class="input-label" for="username">Username</label>
+                <input class="input input-form" type="text" name="username" id="username" value="<%= locals.oldInput ? locals.oldInput.username : "" %>">
+                <%- include("partials/form-error", { errors: locals.errors, pathName: "username" }) %>
+            </div>
+            <div class="form-item">
+                <label class="input-label for="email">Email</label>
+                <input class="input input-form" type="email" name="email" id="email" value="<%= locals.oldInput ? locals.oldInput.email : "" %>">
+                <%- include("partials/form-error", {errors: locals.errors, pathName: "email"}) %>
+            </div>
+            <div class="form-item">
+                <label class="input-label for="password">Password</label>
+                <input class="input input-form" type="password" name="password" id="password">
+                <%- include("partials/form-error", { errors: locals.errors, pathName: "password"}) %>
+            </div>
+            <div class="form-item">
+                <label class="input-label for="confirmPassword">Confirm Password</label>
+                <input class="input input-form" type="password" name="confirmPassword" id="confirmPassword">
+                <%- include("partials/form-error", { errors: locals.errors, pathName: "confirmPassword"}) %>
+            </div>
+            <button class="btn submit-btn" type="submit">Sign Up</button>
+        </form>
+        <div>
+            <p>Already have an account? <a class="link" href="/">Login</a></p>
+        </div>
     </div>
 </body>
 </html>

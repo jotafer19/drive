@@ -4,10 +4,10 @@ const expressSession = require("express-session")
 const passport = require("./config/passport")
 const flash = require("connect-flash")
 const { PrismaSessionStore} = require("@quixo3/prisma-session-store")
-const { PrismaClient} = require("@prisma/client")
+const { PrismaClient, Prisma} = require("@prisma/client")
 require("dotenv").config()
 
-const homeRouter = require("./routes/homeRouter")
+const uploadsRouter = require("./routes/uploadsRouter")
 const loginRouter = require("./routes/loginRouter")
 const signupRouter = require("./routes/signupRouter")
 const logoutRouter = require("./routes/logoutRouter")
@@ -52,15 +52,16 @@ app.use((req, res, next) => {
 
 const prisma = new PrismaClient()
 
-async function main() {
-  const users = await prisma.user.findMany()
-  console.log(users)
+const main = async () => {
+  
+  const data = await prisma.file.findMany()
+  console.log(data)
 }
 
 main()
 
-app.use("/", homeRouter)
-app.use("/login", loginRouter)
+app.use("/", loginRouter)
+app.use("/uploads", uploadsRouter)
 app.use("/signup", signupRouter)
 app.use("/logout", logoutRouter)
 

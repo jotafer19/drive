@@ -3,17 +3,382 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/style/style.css">
     <title>Document</title>
 </head>
 <body>
-    <p>Hello world</p>
-    <% if (locals.currentUser) { %>
-        <p><%= currentUser.username %></p>
+    <%- include("partials/header") %>
+    <div class="main-container container">
+        <section class="create-buttons">
+            <button class="btn add-new new-folder" onclick="newFolder('<%= locals.parentFolder ? parentFolder.id : null %>')">New folder</button>
+            <button class="btn add-new new-file" onclick="newFile('<%= locals.parentFolder ? parentFolder.id : null %>')">New file</button>
+        </section>
+        <main class="main">
+            <navbar class="folder-routes">
+                <a class="link link-route" href="/uploads"><%= currentUser.username %></a>
+                <% if (locals.folderRoute) { %>
+                    <% locals.folderRoute.forEach(folder => { %>
+                        <img class="next-route" src="/svg/next-icon.svg" alt="">
+                        <a class="link link-route" href="/uploads/<%= folder.id %>"><%= folder.name %></a>
+                    <% }) %>
+                <% } %>
+            </navbar>
+            <% if (!locals.folders.length && !locals.files.length) { %>
+                <div class="empty-folder">
+                    <h2 class="empty-icon">(^_^)b</h2>
+                    <div class="empty-text">Nothing to see here!</div>
+                    <button class="btn add-new" onclick="newFolder('<%= locals.parentFolder ? parentFolder.id : null %>')">Create New Folder</button>
+                    <button class="btn add-new" onclick="newFile('<%= locals.parentFolder ? parentFolder.id : null %>')">Upload New file</button>
+                </div>
+            <% } %>
+            <div class="folder-container">
+                <% if (locals.folders) { %>
+                    <% locals.folders.forEach(folder => { %>
+                        <div class="folder-item">
+                                <div class="folder-info" title="<%= folder.name %>">
+                                    <a class="link folder-link" href="/uploads/<%= folder.id %>">
+                                        <img src="/svg/folder-icon.svg" alt="Folder icon">
+                                        <div class="folder-title"><%= folder.name %></div>
+                                    </a>
+                                </div>
+                                <div class="dropdown-wrapper">
+                                    <button type="button" class="dropdown-toggle">
+                                        <img src="/svg/dropdown-icon.svg" alt="Dropdown icon">
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li class="dropdown-item"><button class="dropdown-option" onclick="showModal({id: '<%= folder.id %>', name: '<%= folder.name %>', createdAt: '<%= folder.createdAt %>', updatedAt: '<%= folder.updatedAt %>', action: 'info', type: 'folder' })">Info</button></li>
+                                        <li class="dropdown-item"><button class="dropdown-option" onclick="showModal({ id: '<%= folder.id %>', name: '<%= folder.name %>', action: 'edit', type: 'folder' })">Edit</button></li>
+                                        <li class="dropdown-item"><a class="dropdown-option" href="/uploads/<%= folder.id %>/delete">Delete</a></li>
+                                    </ul>
+                                </div>
+                        </div>
+                    <% }) %>
+                <% } %>
+                <% if (locals.files) { %>
+                    <% locals.files.forEach(file => { %>
+                        <div class="folder-item">
+                                <div class="folder-info" title="<%= file.name %>">
+                                    <a class="link folder-link">
+                                        <img src="/svg/file-icon.svg" alt="Folder icon">
+                                        <div class="folder-title"><%= file.name %></div>
+                                    </a>
+                                </div>
+                                <div class="dropdown-wrapper">
+                                    <button type="button" class="dropdown-toggle">
+                                        <img src="/svg/dropdown-icon.svg" alt="Dropdown icon">
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li class="dropdown-item"><button class="dropdown-option" onclick="showModal({id: '<%= file.id %>', name: '<%= file.name %>', size: '<%= file.size %>', createdAt: '<%= file.createdAt %>', updatedAt: '<%= file.updatedAt %>', action: 'info', type: 'file' })">Info</button></li>
+                                        <li class="dropdown-item"><button class="dropdown-option" onclick="showModal({ id: '<%= file.id %>', name: '<%= file.name %>', action: 'edit', type: 'file' })">Edit</button></li>
+                                        <li class="dropdown-item"><a class="dropdown-option" href="/uploads/file/<%= file.id %>/download">Download</a></li>
+                                        <li class="dropdown-item"><a class="dropdown-option" href="/uploads/file/<%= file.id %>/delete">Delete</a></li>
+                                    </ul>
+                                </div>
+                        </div>
+                    <% }) %>
+                <% } %>
+            </div>
+        </main>
+    </div>
+    <div class="modal">
+        <div class="modal-container">
+            <button class="close-icon" onclick="closeModal()">
+                <img src="/svg/close.svg" alt="Close icon">
+            </button>
+            <div class="modal-content"></div>
+        </div>
+    </div>
+    <% if (createError) {%>
+        <script>
+            document.addEventListener("DOMContentLoaded", () => {
+                    newFolder('<%= parentFolder ? parentFolder.id : null %>', `<%= createError %>`, `<%= oldInput || '' %>`);
+                });
+        </script>
     <% } %>
-    <form action="/" method="post">
-        <input type="file" name="file" id="file">
-        <button type="submit">Submit</button>
-    </form>
-    <a href="/logout">Log Out</a>
+    <% if (editError) { %>
+        <script>
+            document.addEventListener("DOMContentLoaded", () => {
+                editModal({
+                    id: "<%= editTarget.id %>",
+                    name: "<%= editTarget.name %>",
+                    type: "<%= editTarget.type %>",
+                    error: "<%= editError %>"
+                })
+            })
+        </script>
+    <% } %>
 </body>
 </html>
+
+<script>
+    const MENU_DELAY = 200;
+    const dropdownToggles = document.querySelectorAll(".dropdown-toggle");
+    const modal = document.querySelector(".modal")
+    const modalContainer = document.querySelector(".modal-container")
+    const modalContent = document.querySelector(".modal-content")
+
+    const linksRoutes = document.querySelectorAll(".link.link-route")
+    linksRoutes[linksRoutes.length - 1].classList.toggle("last")
+
+    dropdownToggles.forEach(button => {
+        button.addEventListener("click", (event) => {
+            const menu = button.nextElementSibling;
+
+            document.querySelectorAll(".dropdown-menu.show").forEach(openMenu => {
+                if (openMenu !== menu) {
+                    openMenu.classList.remove("show");
+                    setTimeout(() => openMenu.style.left = "", MENU_DELAY);
+                }
+            });
+
+            menu.classList.toggle("show")
+
+            if (menu.classList.contains("show")) {
+                requestAnimationFrame(() => {
+                    const menuRect = menu.getBoundingClientRect();
+                    const buttonRect = button.getBoundingClientRect();
+
+                    const overflowRight = menuRect.right > window.innerWidth;
+
+                    if (overflowRight) {
+                        const shiftAmount = menuRect.right - buttonRect.right;
+                        menu.style.left = `-${shiftAmount}px`;
+                    } else {
+                        menu.style.left = "";
+                    }
+                });
+            } else {
+                setTimeout(() => {
+                    menu.style.left = "";
+                }, MENU_DELAY);
+            }
+
+            event.stopPropagation();
+        });
+    });
+
+    document.addEventListener("click", event => {
+        document.querySelectorAll(".dropdown-menu.show").forEach(openMenu => {
+            if (!openMenu.contains(event.target)) {
+                openMenu.classList.remove("show")
+                setTimeout(() => openMenu.style.left = "", MENU_DELAY);
+            }
+        })
+    })
+
+    const showModal = (data) => {
+        if (data.action === "info") {
+            folderInfo(data)
+        } else if (data.action === "edit") {
+            editModal(data)
+        }
+        
+        document.querySelectorAll(".dropdown-menu.show").forEach(openMenu => {
+            openMenu.classList.toggle("show")
+        })
+    }
+    
+    const closeModal = () => {
+        modalContent.textContent = "";
+        modal.style.display = "none"
+    }
+    
+    const infoTab = (tabName, tabInfo) => {
+        const infoContainer = document.createElement("div")
+        infoContainer.classList.add("info-tab")
+
+        const tabNameContainer = document.createElement("p")
+        const tab = document.createElement("span")
+        tab.textContent = tabName
+        tab.style.fontWeight = "bold"
+
+        const tabInfoContainer = document.createElement("span")
+        tabInfoContainer.textContent = tabInfo
+
+        tabNameContainer.append(tab, tabInfoContainer)
+        infoContainer.append(tabNameContainer)
+
+        return infoContainer;
+    }
+
+    const formatDate = (dateString) => {
+        const date = new Date(dateString)
+
+        const formatDate = date.toLocaleDateString()
+        const formatTime = date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: false })
+
+        return formatDate + ", " + formatTime;
+    }
+    
+    const folderInfo = (data) => {
+        modal.style.display = "flex"
+
+        const infoToDisplay = []
+
+        modalContent.style.display = "flex"
+        modalContent.style.flexDirection = "column"
+        modalContent.style.gap = "1rem"
+
+        const folderIcon = document.createElement("img")
+        folderIcon.src = (data.type === "folder" ? "/svg/folder-open-icon.svg" : "/svg/file-open-icon.svg")
+        folderIcon.alt = `Open ${data.type === "folder" ? "folder" : "file"} icon`
+        folderIcon.style.width = "60px"
+        folderIcon.style.alignSelf = "center"
+
+        const folderName = document.createElement("h2")
+        folderName.textContent = data.name
+        folderName.classList.add("info-folder-title")
+
+        infoToDisplay.push(folderIcon, folderName)
+        
+        const createdAtDate = formatDate(data.createdAt)
+        const updatedAtDate = formatDate(data.updatedAt)
+        
+        if (data.type === "file") {
+            const sizeInfo = infoTab("Size: ", formatFileSize(Number(data.size)))
+            infoToDisplay.push(sizeInfo)
+        }
+        
+        const createdInfo = infoTab("Created at: ", createdAtDate)
+        const updatedInfo = infoTab("Updated at: ", updatedAtDate)
+        infoToDisplay.push(createdInfo, updatedInfo)
+
+        modalContent.append(...infoToDisplay)
+    }
+
+    function formatFileSize(size) {
+        const units = ["bytes", "KB", "MB", "GB", "TB"]
+        let i = 0;
+
+        while (size >= 1000 && i < units.length - 1) {
+            size /= 1000;
+            i++;
+        }
+
+        return `${size.toFixed(2)} ${units[i]}`
+    }
+
+    const editModal = (data) => {
+        modal.style.display = "flex"
+        
+        const form = document.createElement("form")
+        form.classList.add("form")
+        form.method = "post"
+        form.action = (data.type === "folder" ? `/uploads/${data.id}/edit` : `/uploads/file/${data.id}/edit`)
+
+        const formItem = document.createElement("div")
+        formItem.classList.add("form-item")
+
+        const label = document.createElement("label")
+        label.textContent = "Change name"
+        label.htmlFor = "folder-name"
+
+        const input = document.createElement("input")
+        input.classList.add("input", "input-form")
+        input.type = "text"
+        input.name = "folder-name"
+        input.id = "folder-name"
+        input.value = data.name
+
+        const button = document.createElement("button")
+        button.classList.add("btn", "submit-btn")
+        button.type = "submit"
+        button.textContent = "Edit"
+
+        formItem.append(label, input)
+        form.append(formItem)
+
+            if (data.error) {
+        const error = document.createElement("p");
+        error.classList.add("error-message");
+        error.style.color = "red";
+        error.style.marginTop = "0.5rem";
+        error.style.fontSize = "0.9rem";
+        error.textContent = data.error;
+        form.append(error);
+    }
+
+        form.append(button)
+        modalContent.append(form)
+
+        setTimeout(() => {
+            input.select()
+            input.focus()
+        }, 0)
+    }
+
+    const newFolder = (parentFolder, errorMessage = "", oldInput = "") => {
+        modal.style.display = "flex"
+
+        const form = document.createElement("form")
+        form.classList.add("form")
+        form.method = "post"
+        form.action = `/uploads/${parentFolder ? parentFolder : ""}/create`
+
+        const formItem = document.createElement("div")
+        formItem.classList.add("form-item")
+
+        const label = document.createElement("label")
+        label.textContent = "New folder"
+        label.htmlFor = "folder-name"
+
+        const input = document.createElement("input")
+        input.classList.add("input", "input-form")
+        input.type = "text"
+        input.name = "folder-name"
+        input.id = "folder-name"
+        input.placeholder = "Enter a name"
+        input.value = oldInput
+
+        const error = document.createElement("p");
+        error.classList.add("error-message");
+        error.style.color = "red";
+        error.style.marginTop = "0.5rem";
+        error.style.fontSize = "0.9rem";
+        error.textContent = errorMessage;
+
+        const button = document.createElement("button")
+        button.classList.add("btn", "submit-btn")
+        button.type = "submit"
+        button.textContent = "Add folder"
+
+        formItem.append(label, input)
+        form.append(formItem)
+        if (errorMessage) form.append(error);
+        form.append(button)
+        modalContent.append(form)
+
+        setTimeout(() => {
+            input.focus()
+        }, 0)
+    }
+
+    const newFile = (parentFolder) => {
+        modal.style.display = "flex"
+
+        const form = document.createElement("form")
+        form.classList.add("form")
+        form.method = "post"
+        form.action = `/uploads/${parentFolder ? parentFolder + "/file" : "file"}`
+        form.enctype = "multipart/form-data"
+
+        const input = document.createElement("input")
+        input.classList.add("input", "input-form")
+        input.type = "file"        
+        input.name = "file"
+
+        const button = document.createElement("button")
+        button.classList.add("btn", "submit-btn")
+        button.type = "submit"
+        button.textContent = "Add file"
+
+        form.append(input, button)
+        modalContent.append(form)
+    }
+
+    modal.addEventListener("click", (event) => {
+        if (event.target === modal) {
+            closeModal()
+        }
+    })
+</script>

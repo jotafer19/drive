@@ -2,7 +2,7 @@ const passport = require("../config/passport")
 
 exports.loginGet = (req, res) => {
     if (req.isAuthenticated()) {
-        res.redirect("/")
+        return res.redirect("/uploads")
     }
 
     res.render("login")
@@ -10,9 +10,8 @@ exports.loginGet = (req, res) => {
 
 exports.loginPost = (req, res, next) => {
     passport.authenticate("local", {
-      successRedirect: "/",
-      failureRedirect: "/login",
-      // failureFlash: "Incorrect email or password",
-      failureFlash: true,
+      successRedirect: "/uploads",
+      failureRedirect: "/",
+      failureFlash: "Incorrect email or password.",
     })(req, res, next);
   };
