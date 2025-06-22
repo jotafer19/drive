@@ -314,3 +314,23 @@ a.dropdown-option {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+
+.icon {
+  width: 24px;
+}
+
+.file-input {
+  height: auto;
+  padding: 0.75rem 0 0 0;
+}
+
+input::file-selector-button {
+  height: 30px;
+  padding: 0 0.5rem;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+input::file-selector-button:hover {
+  background-color: rgb(211, 211, 211);
+}

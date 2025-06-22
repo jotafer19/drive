@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node app.js --watch"
+    "start": "node app.js --watch",
+    "prettier": "prettier . --write"
   },
   "keywords": [],
   "author": "",

@@ -59,7 +59,14 @@
                         <div class="folder-item">
                                 <div class="folder-info" title="<%= file.name %>">
                                     <a class="link folder-link">
-                                        <img src="/svg/file-icon.svg" alt="Folder icon">
+                                        <% 
+                                            let iconSource = file.type.includes("image") ? "/svg/image-icon.svg"
+                                                           : file.type.includes("pdf") ? "/svg/pdf-icon.svg"
+                                                           : file.type.includes("word") || file.type.includes("text") ? "/svg/doc-icon.svg"
+                                                           : file.type.includes("excel") || file.type.includes("spreadsheet") ? "/svg/excel-icon.svg"
+                                                           : "/svg/file-icon.svg"
+                                        %>
+                                        <img class="icon" src="<%= iconSource %>" alt="Folder icon">
                                         <div class="folder-title"><%= file.name %></div>
                                     </a>
                                 </div>
@@ -298,11 +305,8 @@
         form.append(formItem)
 
         if (data.error) {
-            const error = document.createElement("p");
-            error.classList.add("error-message");
-            error.style.color = "red";
-            error.style.marginTop = "0.5rem";
-            error.style.fontSize = "0.9rem";
+            const error = document.createElement("span");
+            error.classList.add("error", "msg");
             error.textContent = data.error;
             form.append(error);
         }
@@ -339,11 +343,8 @@
         input.placeholder = "Enter a name"
         input.value = oldInput
 
-        const error = document.createElement("p");
-        error.classList.add("error-message");
-        error.style.color = "red";
-        error.style.marginTop = "0.5rem";
-        error.style.fontSize = "0.9rem";
+        const error = document.createElement("span");
+        error.classList.add("error", "msg");
         error.textContent = errorMessage;
 
         const button = document.createElement("button")
@@ -372,15 +373,12 @@
         form.enctype = "multipart/form-data"
 
         const input = document.createElement("input")
-        input.classList.add("input", "input-form")
+        input.classList.add("input", "input-form", "file-input")
         input.type = "file"        
         input.name = "file"
 
-        const error = document.createElement("p");
-        error.classList.add("error-message");
-        error.style.color = "red";
-        error.style.marginTop = "0.5rem";
-        error.style.fontSize = "0.9rem";
+        const error = document.createElement("span");
+        error.classList.add("error", "msg");
         error.textContent = errorMessage;
 
         const button = document.createElement("button")

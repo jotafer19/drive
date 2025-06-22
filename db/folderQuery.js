@@ -1,4 +1,5 @@
 const { PrismaClient } = require("@prisma/client");
+const { supabase } = require("../supabase/supabase");
 const prisma = new PrismaClient();
 
 async function createFolder(folderName, userId, parentId) {
@@ -65,19 +66,41 @@ async function deleteFolder(userId, folderId, array = []) {
     },
   });
 
-  for (const folder of childrenFolders) {
-    await deleteFolder(userId, folder.id, array);
-  }
+  await Promise.all(childrenFolders.map(folder => deleteFolder(userId, folder.id, array)))
 
   if (folderId === array[0]) {
-    return await prisma.folder.deleteMany({
+    const files = await prisma.file.findMany({
       where: {
-        id: {
-          in: array,
-        },
-      },
-    });
+        folderId: {
+          in: array
+        }
+      }
+    })
+
+    await prisma.$transaction(async (tx) => {
+      await Promise.all(files.map(file => tx.file.delete({
+        where: {
+          id: file.id
+        }
+      })))
+
+      await tx.folder.deleteMany({
+        where: {
+          id: {
+            in: array
+          }
+        }
+      })
+    })
+
+    const { data, error } = await supabase.storage
+      .from("uploads")
+      .remove(files.map(file => file.bucketId));
+
+    return { deletedFolders: array.length, deletedFiles: files.length };
   }
+
+  return null;
 }
 
 async function editFolder(userId, folderId, newName) {

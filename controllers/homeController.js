@@ -4,7 +4,7 @@ const { supabase } = require("../supabase/supabase");
 const { v4: uuidv4 } = require("uuid");
 const { validationResult } = require("express-validator");
 const validateFolder = require("../validators/folderValidator");
-const validateFile = require("../validators/fileValidator")
+const validateFile = require("../validators/fileValidator");
 
 exports.homeGet = async (req, res) => {
   if (!req.isAuthenticated()) {
@@ -28,7 +28,7 @@ exports.homeGet = async (req, res) => {
   const oldInput = req.session.oldInput || null;
   const editError = req.session.editError || null;
   const editTarget = req.session.editTarget || null;
-  const fileError = req.session.fileError || null
+  const fileError = req.session.fileError || null;
 
   // Clean session
   req.session.createError = null;
@@ -48,7 +48,7 @@ exports.homeGet = async (req, res) => {
     oldInput,
     editError,
     editTarget,
-    fileError
+    fileError,
   });
 };
 
@@ -72,16 +72,16 @@ exports.createPost = [
   },
 ];
 
-exports.deleteFolder = async (req, res) => {
-  const userId = req.user.id;
-  const folderId = req.params.folderId || null;
-  const routes = await folderQuery.getFolderRoute(userId, folderId);
-  const parentId = routes[routes.length - 1].parentId;
+  exports.deleteFolder = async (req, res) => {
+    const userId = req.user.id;
+    const folderId = req.params.folderId || null;
+    const routes = await folderQuery.getFolderRoute(userId, folderId);
+    const parentId = routes[routes.length - 1].parentId;
 
-  await folderQuery.deleteFolder(userId, folderId);
-
-  res.redirect("/uploads/" + (parentId ? parentId : ""));
-};
+    await folderQuery.deleteFolder(userId, folderId);
+    
+    res.redirect("/uploads/" + (parentId ? parentId : ""));
+  };
 
 exports.editNamePost = [
   validateFolder,
@@ -114,82 +114,81 @@ exports.editNamePost = [
   },
 ];
 
-
 exports.addFilePost = [
   validateFile,
   async (req, res) => {
-    const errors = validationResult(req)
-  const userId = req.user.id;
-  const folderId = req.params.folderId || null;
+    const errors = validationResult(req);
+    const userId = req.user.id;
+    const folderId = req.params.folderId || null;
 
-  if (!errors.isEmpty()) {
-    req.session.fileError = errors.array()[0].msg;
-    
-    return res.redirect("/uploads/" + (folderId ? folderId : ""));
-  }
+    if (!errors.isEmpty()) {
+      req.session.fileError = errors.array()[0].msg;
 
-  const { originalname, buffer, mimetype, size } = req.file;
+      return res.redirect("/uploads/" + (folderId ? folderId : ""));
+    }
 
-  const supabaseName = uuidv4();
+    const { originalname, buffer, mimetype, size } = req.file;
 
-  const { data, error } = await supabase.storage
-    .from("uploads")
-    .upload(supabaseName, buffer, {
-      contentType: mimetype,
-      upsert: false,
-    });
+    const supabaseName = uuidv4();
 
-  if (error) {
-    console.error("Upload error:", error);
-    return res.status(500).send("Failed to upload");
-  }
+    const { data, error } = await supabase.storage
+      .from("uploads")
+      .upload(supabaseName, buffer, {
+        contentType: mimetype,
+        upsert: false,
+      });
 
-  const { data: fileURL } = await supabase.storage
-    .from("uploads")
-    .createSignedUrl(data.path, 60 * 60);
+    if (error) {
+      console.error("Upload error:", error);
+      return res.status(500).send("Failed to upload");
+    }
 
-  await fileQuery.addFile(
-    userId,
-    folderId,
-    originalname,
-    size,
-    mimetype,
-    supabaseName,
-    fileURL.signedUrl,
-  );
+    const { data: fileURL } = await supabase.storage
+      .from("uploads")
+      .createSignedUrl(data.path, 60 * 60);
 
-  res.redirect("/uploads/" + (folderId ? folderId : ""));
-}
-]
+    await fileQuery.addFile(
+      userId,
+      folderId,
+      originalname,
+      size,
+      mimetype,
+      supabaseName,
+      fileURL.signedUrl,
+    );
+
+    res.redirect("/uploads/" + (folderId ? folderId : ""));
+  },
+];
 
 exports.editFilePost = [
   validateFolder,
   async (req, res) => {
-    const errors = validationResult(req)
+    const errors = validationResult(req);
 
-  const userId = req.user.id;
-  const fileId = req.params.fileId;
+    const userId = req.user.id;
+    const fileId = req.params.fileId;
 
-  const file = await fileQuery.getFile(userId, fileId);
+    const file = await fileQuery.getFile(userId, fileId);
 
-  const newName = req.body["folder-name"];
+    const newName = req.body["folder-name"];
 
-  if (!errors.isEmpty()) {
-    req.session.editError = errors.array()[0].msg;
-    req.session.editTarget = {
-      id: fileId,
-      name: newName,
-      type: "file",
+    if (!errors.isEmpty()) {
+      req.session.editError = errors.array()[0].msg;
+      req.session.editTarget = {
+        id: fileId,
+        name: newName,
+        type: "file",
+      };
+
+      return res.redirect("/uploads/" + (file.folderId ? file.folderId : ""));
     }
 
-    return res.redirect("/uploads/" + (file.folderId ? file.folderId : ""));
-  }
+    await fileQuery.editFile(userId, fileId, newName);
 
-  await fileQuery.editFile(userId, fileId, newName);
-
-  res.redirect("/uploads/" + (file.folderId ? file.folderId : ""));
-}
-]
+    res.redirect("/uploads/" + (file.folderId ? file.folderId : ""));
+  },
+];
 
 exports.deleteFile = async (req, res) => {
   const userId = req.user.id;
