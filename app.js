@@ -11,6 +11,7 @@ const uploadsRouter = require("./routes/uploadsRouter");
 const loginRouter = require("./routes/loginRouter");
 const signupRouter = require("./routes/signupRouter");
 const logoutRouter = require("./routes/logoutRouter");
+const pageNotFoundRouter = require("./routes/pageNotFoundRouter");
 
 const app = express();
 
@@ -60,10 +61,14 @@ app.use("/", loginRouter);
 app.use("/uploads", uploadsRouter);
 app.use("/signup", signupRouter);
 app.use("/logout", logoutRouter);
+app.use("*", pageNotFoundRouter);
 
 app.use((err, req, res, next) => {
-  console.log(err);
-  res.status(500).send(err);
+  const errMsg = err.message || "Oops! Something went wrong";
+  res.status(err.status || 500).render("404", {
+    title: errMsg,
+    errorMessage: errMsg,
+  });
 });
 
 app.listen(3000, () => console.log("Connected"));

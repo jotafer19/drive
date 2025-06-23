@@ -36,7 +36,7 @@
                     <% locals.folders.forEach(folder => { %>
                         <div class="folder-item">
                                 <div class="folder-info" title="<%= folder.name %>">
-                                    <a class="link folder-link" href="/uploads/<%= folder.id %>">
+                                    <a class="folder-link" href="/uploads/<%= folder.id %>">
                                         <img src="/svg/folder-icon.svg" alt="Folder icon">
                                         <div class="folder-title"><%= folder.name %></div>
                                     </a>
@@ -58,7 +58,7 @@
                     <% locals.files.forEach(file => { %>
                         <div class="folder-item">
                                 <div class="folder-info" title="<%= file.name %>">
-                                    <a class="link folder-link">
+                                    <a class="folder-link">
                                         <% 
                                             let iconSource = file.type.includes("image") ? "/svg/image-icon.svg"
                                                            : file.type.includes("pdf") ? "/svg/pdf-icon.svg"
@@ -326,7 +326,7 @@
         const form = document.createElement("form")
         form.classList.add("form")
         form.method = "post"
-        form.action = `/uploads/${parentFolder ? parentFolder : ""}/create`
+        form.action = `/uploads/${parentFolder ? parentFolder + "/" : ""}create`
 
         const formItem = document.createElement("div")
         formItem.classList.add("form-item")

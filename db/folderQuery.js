@@ -47,12 +47,14 @@ async function getFolderRoute(userId, folderId, array = []) {
     },
   });
 
+  if (!folder) return;
+
   array.push(folder);
 
-  if (folder.parentId) {
-    return await getFolderRoute(userId, folder.parentId, array);
-  } else {
+  if (!folder.parentId) {
     return array.reverse();
+  } else {
+    return await getFolderRoute(userId, folder.parentId, array);
   }
 }
 
@@ -66,36 +68,42 @@ async function deleteFolder(userId, folderId, array = []) {
     },
   });
 
-  await Promise.all(childrenFolders.map(folder => deleteFolder(userId, folder.id, array)))
+  await Promise.all(
+    childrenFolders.map((folder) => deleteFolder(userId, folder.id, array)),
+  );
 
   if (folderId === array[0]) {
     const files = await prisma.file.findMany({
       where: {
         folderId: {
-          in: array
-        }
-      }
-    })
+          in: array,
+        },
+      },
+    });
 
     await prisma.$transaction(async (tx) => {
-      await Promise.all(files.map(file => tx.file.delete({
-        where: {
-          id: file.id
-        }
-      })))
+      await Promise.all(
+        files.map((file) =>
+          tx.file.delete({
+            where: {
+              id: file.id,
+            },
+          }),
+        ),
+      );
 
       await tx.folder.deleteMany({
         where: {
           id: {
-            in: array
-          }
-        }
-      })
-    })
+            in: array,
+          },
+        },
+      });
+    });
 
     const { data, error } = await supabase.storage
       .from("uploads")
-      .remove(files.map(file => file.bucketId));
+      .remove(files.map((file) => file.bucketId));
 
     return { deletedFolders: array.length, deletedFiles: files.length };
   }

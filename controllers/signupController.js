@@ -1,5 +1,6 @@
 const bcrypt = require("bcryptjs");
 const dbUser = require("../db/userQuery");
+const asyncHandler = require("express-async-handler")
 const { validationResult } = require("express-validator");
 const validateUser = require("../validators/signupValidator");
 
@@ -13,7 +14,7 @@ exports.signupGet = (req, res) => {
 
 exports.signupPost = [
   validateUser,
-  async (req, res, next) => {
+  asyncHandler(async (req, res, next) => {
     const errors = validationResult(req);
 
     if (!errors.isEmpty()) {
@@ -38,5 +39,5 @@ exports.signupPost = [
         next(dbErr);
       }
     });
-  },
+  })
 ];
