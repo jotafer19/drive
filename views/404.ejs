@@ -9,9 +9,11 @@
 <body>
     <%- include("partials/header") %>
     <div class="container">
-        <img class="icon" src="/svg/error_icon.svg" alt="Error icon">
-        <h2 class="form-title"><%= errorMessage %></h2>
-        <a href="/uploads">Return home</a>
+        <div class="error-page">
+            <img class="icon error-icon" src="/svg/error-icon.svg" alt="Error icon">
+            <h2 class="form-title"><%= errorMessage %></h2>
+            <a class="link error-link" href="/uploads">Return home</a>
+        </div>
     </div>
 </body>
 </html>

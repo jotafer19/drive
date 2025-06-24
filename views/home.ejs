@@ -372,6 +372,13 @@
         form.action = `/uploads/${parentFolder ? parentFolder + "/file" : "file"}`
         form.enctype = "multipart/form-data"
 
+        const formItem = document.createElement("div")
+        formItem.classList.add("form-item")
+
+        const label = document.createElement("label")
+        label.textContent = "New file"
+        label.htmlFor = "file"
+
         const input = document.createElement("input")
         input.classList.add("input", "input-form", "file-input")
         input.type = "file"        
@@ -386,7 +393,8 @@
         button.type = "submit"
         button.textContent = "Add file"
 
-        form.append(input)
+        formItem.append(label, input)
+        form.append(formItem)
         if (errorMessage) form.append(error)
         form.append(button)
         modalContent.append(form)

@@ -23,7 +23,7 @@ exports.homeGet = asyncHandler(async (req, res) => {
 
   if (currentFolderId && !parentFolder) {
     const error = new Error(
-      "The folder you're trying to access does not exist.",
+      "The folder you're trying to access does not exist",
     );
     error.status = 404;
     throw error;
@@ -69,7 +69,7 @@ exports.createPost = [
     if (parentId) {
       const folder = await folderQuery.getFolder(req.user.id, parentId)
       if (!folder) {
-        const error = new Error("Parent folder not found.")
+        const error = new Error("Parent folder not found")
         error.status = 404;
         throw error;
       }
@@ -88,7 +88,7 @@ exports.deleteFolder = asyncHandler(async (req, res) => {
   if (folderId) {
     const folder = await folderQuery.getFolder(userId, folderId)
     if (!folder) {
-        const error = new Error("Folder not found.")
+        const error = new Error("Folder not found")
         error.status = 404;
         throw error;
     }
@@ -112,7 +112,7 @@ exports.editNamePost = [
     const folder = await folderQuery.getFolder(userId, folderId)
 
     if (!folder) {
-        const error = new Error("Folder not found.")
+        const error = new Error("Folder not found")
         error.status = 404;
         throw error;
     }
@@ -155,7 +155,7 @@ exports.addFilePost = [
     if (folderId) {
       const folder = await folderQuery.getFolder(req.user.id, folderId)
       if (!folder) {
-        const error = new Error("Folder not found.")
+        const error = new Error("Folder not found")
         error.status = 404;
         throw error;
       }
@@ -205,7 +205,7 @@ exports.editFilePost = [
     const file = await fileQuery.getFile(userId, fileId);
 
     if (!file) {
-        const error = new Error("File not found.")
+        const error = new Error("File not found")
         error.status = 404;
         throw error;
     }
@@ -236,7 +236,7 @@ exports.deleteFile = asyncHandler(async (req, res) => {
   const file = await fileQuery.getFile(userId, fileId);
 
   if (!file) {
-    const error = new Error("File not found.")
+    const error = new Error("File not found")
     error.status = 404;
     throw error;
   }
@@ -257,7 +257,7 @@ exports.downloadFile = asyncHandler(async (req, res) => {
   const file = await fileQuery.getFile(userId, fileId);
 
   if (!file) {
-    const error = new Error("File not found.")
+    const error = new Error("File not found")
     error.status = 404;
     throw error;
   }
