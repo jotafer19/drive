@@ -13,7 +13,9 @@
         <section class="create-buttons">
             <button class="btn add-new new-folder" onclick="newFolder('<%= locals.parentFolder ? parentFolder.id : null %>')">New folder</button>
             <button class="btn add-new new-file" onclick="newFile('<%= locals.parentFolder ? parentFolder.id : null %>')">New file</button>
-            <button class="btn add-new share-folder" onclick="shareFolder('<%= locals.parentFolder ? parentFolder.id : null %>')">Share folder</button>
+            <% if (parentFolder) { %>
+                <button class="btn add-new share-folder" onclick="shareFolder('<%= locals.parentFolder ? parentFolder.id : null %>')">Share folder</button>
+            <% } %>
         </section>
         <main class="main">
             <navbar class="folder-routes">
