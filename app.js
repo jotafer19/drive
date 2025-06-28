@@ -51,12 +51,12 @@ app.use((req, res, next) => {
 
 const prisma = new PrismaClient();
 
-// const main = async () => {
-//   const data = await prisma.file.findMany();
-//   console.log(data);
-// };
+const main = async () => {
+  const data = await prisma.user.deleteMany();
+  console.log(data);
+};
 
-// main();
+main();
 
 app.use("/", loginRouter);
 app.use("/uploads", uploadsRouter);
