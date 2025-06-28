@@ -9,6 +9,7 @@ require("dotenv").config();
 
 const uploadsRouter = require("./routes/uploadsRouter");
 const loginRouter = require("./routes/loginRouter");
+const publicRouter = require("./routes/publicRouter")
 const signupRouter = require("./routes/signupRouter");
 const logoutRouter = require("./routes/logoutRouter");
 const pageNotFoundRouter = require("./routes/pageNotFoundRouter");
@@ -50,17 +51,18 @@ app.use((req, res, next) => {
 
 const prisma = new PrismaClient();
 
-const main = async () => {
-  const data = await prisma.file.findMany();
-  console.log(data);
-};
+// const main = async () => {
+//   const data = await prisma.file.findMany();
+//   console.log(data);
+// };
 
-main();
+// main();
 
 app.use("/", loginRouter);
 app.use("/uploads", uploadsRouter);
 app.use("/signup", signupRouter);
 app.use("/logout", logoutRouter);
+app.use("/public", publicRouter)
 app.use("*", pageNotFoundRouter);
 
 app.use((err, req, res, next) => {

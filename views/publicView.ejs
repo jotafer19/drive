@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/style/style.css">
+    <title>Public View</title>
+</head>
+<body>
+    <%- include("partials/header", { sharedLink: sharedLink.id }) %>
+    <div class="main-container container">
+        <main class="main">
+            <navbar class="folder-routes">
+                <% if (folderRoute) { %>
+                    <% folderRoute.forEach((folder, index) => { %>
+                        <a class="link link-route" href="/public/<%= sharedLink.id %>/<%= folder.id %>"><%= folder.name %></a>
+                        <% if (index < folderRoute.length - 1) { %>
+                            <img class="next-route" src="/svg/next-icon.svg" alt="">
+                        <% } %>
+                    <% }) %>
+                <% } %>
+            </navbar>
+            <% if (!childrenFolders.length && !locals.files.length) { %>
+                <div class="empty-folder">
+                    <h2 class="empty-icon">(^_^)b</h2>
+                    <div class="empty-text">Nothing to see here!</div>
+            <% } %>
+            <div class="folder-container">
+                <% if (childrenFolders) { %>
+                    <% childrenFolders.forEach(folder => { %>
+                        <div class="folder-item">
+                                <div class="folder-info" title="<%= folder.name %>">
+                                    <a class="folder-link" href="/public/<%= sharedLink.id %>/<%= folder.id %>">
+                                        <img src="/svg/folder-icon.svg" alt="Folder icon">
+                                        <div class="folder-title"><%= folder.name %></div>
+                                    </a>
+                                </div>
+                                <div class="dropdown-wrapper">
+                                    <button type="button" class="dropdown-toggle">
+                                        <img src="/svg/dropdown-icon.svg" alt="Dropdown icon">
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li class="dropdown-item"><button class="dropdown-option" onclick="showModal({id: '<%= folder.id %>', name: '<%= folder.name %>', createdAt: '<%= folder.createdAt %>', updatedAt: '<%= folder.updatedAt %>', action: 'info', type: 'folder' })">Info</button></li>
+                                    </ul>
+                                </div>
+                        </div>
+                    <% }) %>
+                <% } %>
+                <% if (locals.files) { %>
+                    <% locals.files.forEach(file => { %>
+                        <div class="folder-item">
+                                <div class="folder-info" title="<%= file.name %>">
+                                    <a class="folder-link">
+                                        <% 
+                                            let iconSource = file.type.includes("image") ? "/svg/image-icon.svg"
+                                                           : file.type.includes("pdf") ? "/svg/pdf-icon.svg"
+                                                           : file.type.includes("word") || file.type.includes("text") ? "/svg/doc-icon.svg"
+                                                           : file.type.includes("excel") || file.type.includes("spreadsheet") ? "/svg/excel-icon.svg"
+                                                           : "/svg/file-icon.svg"
+                                        %>
+                                        <img class="icon" src="<%= iconSource %>" alt="Folder icon">
+                                        <div class="folder-title"><%= file.name %></div>
+                                    </a>
+                                </div>
+                                <div class="dropdown-wrapper">
+                                    <button type="button" class="dropdown-toggle">
+                                        <img src="/svg/dropdown-icon.svg" alt="Dropdown icon">
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li class="dropdown-item"><button class="dropdown-option" onclick="showModal({id: '<%= file.id %>', name: '<%= file.name %>', size: '<%= file.size %>', archive: '<%= file.type %>' , createdAt: '<%= file.createdAt %>', updatedAt: '<%= file.updatedAt %>', action: 'info', type: 'file' })">Info</button></li>
+                                        <li class="dropdown-item"><a class="dropdown-option" href="/uploads/file/<%= file.id %>/download">Download</a></li>
+                                    </ul>
+                                </div>
+                        </div>
+                    <% }) %>
+                <% } %>
+            </div>
+        </main>
+    </div>
+    <div class="modal">
+        <div class="modal-container">
+            <button class="close-icon" onclick="closeModal()">
+                <img src="/svg/close.svg" alt="Close icon">
+            </button>
+            <div class="modal-content"></div>
+        </div>
+    </div>
+</body>
+</html>

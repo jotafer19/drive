@@ -12,6 +12,7 @@
         <section class="create-buttons">
             <button class="btn add-new new-folder" onclick="newFolder('<%= locals.parentFolder ? parentFolder.id : null %>')">New folder</button>
             <button class="btn add-new new-file" onclick="newFile('<%= locals.parentFolder ? parentFolder.id : null %>')">New file</button>
+            <button class="btn add-new share-folder" onclick="shareFolder('<%= locals.parentFolder ? parentFolder.id : null %>')">Share folder</button>
         </section>
         <main class="main">
             <navbar class="folder-routes">
@@ -119,6 +120,14 @@
         <script>
             document.addEventListener("DOMContentLoaded", () => {
                 newFile("<%= parentFolder ? parentFolder.id : null %>", "<%= fileError %>")
+            })
+        </script>
+    <% } %>
+
+    <% if (sharedLink) { %>
+        <script>
+            document.addEventListener("DOMContentLoaded", () => {
+                shareFolder('<%= locals.parentFolder ? parentFolder.id : null %>', '<%= sharedLink %>')
             })
         </script>
     <% } %>
@@ -398,6 +407,93 @@
         if (errorMessage) form.append(error)
         form.append(button)
         modalContent.append(form)
+    }
+
+        const shareFolder = (parentFolder, shareLink = null) => {
+        const durations = [
+            { label: "1 hour", value: "1" },
+            { label: "3 hours", value: "3" },
+            { label: "1 day", value: "24" },
+            { label: "3 days", value: "72" },
+            { label: "10 days", value: "240" }
+        ];
+
+        modal.style.display = "flex"
+        
+        const form = document.createElement("form")
+        form.classList.add("form")
+        form.method = "post"
+        form.action = `/public/${parentFolder}`
+
+        const legend = document.createElement("label")
+        legend.textContent = "Select link's duration"
+        form.append(legend)
+
+        const buttonGroup = document.createElement('div');
+        buttonGroup.className = "button-group";
+
+        durations.forEach((option, index) => {
+            const div = document.createElement('div');
+            div.className = "duration-option";
+
+            const input = document.createElement('input');
+            input.type = "radio";
+            input.name = "duration";
+            input.id = `duration-${index}`;
+            input.value = option.value;
+
+            const label = document.createElement('label');
+            label.htmlFor = input.id;
+            label.textContent = option.label;
+
+            div.appendChild(input);
+            div.appendChild(label);
+            buttonGroup.appendChild(div);
+
+            if (shareLink) {
+                input.disabled = true;
+                label.classList.add("disabled");
+            }
+            if (!shareLink && option.value === "24") {
+                input.checked = true;
+            }
+        });
+
+
+        const button = document.createElement("button")
+        button.classList.add("btn", "submit-btn")
+        button.type = "submit"
+        button.textContent = "Share"
+        if (shareLink) {
+            button.disabled = true;
+            button.classList.add("disabled");
+        }
+
+        form.append(buttonGroup, button)
+        modalContent.append(form)
+
+        if (shareLink) {
+            const copyContainer = document.createElement("div");
+            copyContainer.classList.add("copy-container");
+
+            const linkDisplay = document.createElement("div");
+            linkDisplay.classList.add("share-link");
+            linkDisplay.textContent = shareLink;
+
+            const copyButton = document.createElement("button");
+            copyButton.textContent = "Copy";
+            copyButton.type = "button";
+            copyButton.classList.add("btn", "add-new", "share-btn");
+
+            copyButton.addEventListener("click", () => {
+                navigator.clipboard.writeText(shareLink);
+                copyButton.textContent = "Copied!";
+                setTimeout(() => (copyButton.textContent = "Copy"), 2000);
+            });
+
+            copyContainer.append(linkDisplay, copyButton);
+            modalContent.append(copyContainer);
+        }
     }
 
     modal.addEventListener("click", (event) => {

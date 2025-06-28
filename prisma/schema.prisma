@@ -15,26 +15,28 @@ model Session {
 }
 
 model User {
-  id        String   @id @default(uuid())
-  username  String   @db.VarChar(20)
-  email     String   @unique
+  id        String      @id @default(uuid())
+  username  String      @db.VarChar(20)
+  email     String      @unique
   password  String
-  createdAt DateTime @default(now())
+  createdAt DateTime    @default(now())
   folders   Folder[]
   files     File[]
+  ShareLink ShareLink[]
 }
 
 model Folder {
-  id        String   @id @default(uuid())
-  name      String   @db.VarChar(20)
-  user      User     @relation(fields: [userId], references: [id])
+  id        String      @id @default(uuid())
+  name      String      @db.VarChar(20)
+  user      User        @relation(fields: [userId], references: [id])
   userId    String
-  parent    Folder?  @relation("FolderToFolder", fields: [parentId], references: [id])
+  parent    Folder?     @relation("FolderToFolder", fields: [parentId], references: [id])
   parentId  String?
-  children  Folder[] @relation("FolderToFolder")
+  children  Folder[]    @relation("FolderToFolder")
   files     File[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+  ShareLink ShareLink[]
 }
 
 model File {
@@ -50,4 +52,17 @@ model File {
   folderId  String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model ShareLink {
+  id        String   @id @default(uuid())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  folder    Folder?  @relation(fields: [folderId], references: [id])
+  folderId  String?
+  createdAt DateTime @default(now())
+  expiresAt DateTime
+
+  @@index([userId])
+  @@index([folderId])
 }

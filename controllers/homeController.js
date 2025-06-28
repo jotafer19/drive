@@ -29,7 +29,7 @@ exports.homeGet = asyncHandler(async (req, res) => {
     throw error;
   }
 
-  const { createError, oldInput, editError, editTarget, fileError } =
+  const { createError, oldInput, editError, editTarget, fileError, sharedLink } =
     req.session || {};
 
   // Clean session
@@ -38,6 +38,7 @@ exports.homeGet = asyncHandler(async (req, res) => {
   delete req.session.editError;
   delete req.session.editTarget;
   delete req.session.fileError;
+  delete req.session.sharedLink
 
   res.render("home", {
     parentFolder,
@@ -49,6 +50,7 @@ exports.homeGet = asyncHandler(async (req, res) => {
     editError,
     editTarget,
     fileError,
+    sharedLink
   });
 });
 

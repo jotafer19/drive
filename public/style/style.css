@@ -386,3 +386,70 @@ input::file-selector-button:hover {
 .error-icon {
   width: 64px;
 }
+
+/* SHARE */
+
+.button-group {
+  display: flex;
+  justify-content: space-between;
+}
+
+.duration-option input[type="radio"] {
+  display: none;
+}
+
+.duration-option label {
+  padding: 8px;
+  font-size: 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  cursor: pointer;
+  background-color: #f9f9f9;
+  transition:
+    background-color 0.2s,
+    border-color 0.2s;
+}
+
+.duration-option input[type="radio"]:checked + label {
+  background-color: #007bff;
+  color: white;
+  border-color: #007bff;
+}
+
+.duration-option label.disabled {
+  color: #999;
+  cursor: not-allowed;
+}
+
+button.disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.copy-container {
+    margin-top: 20px;
+    padding: 16px;
+    background-color: #f4f4f4;
+    border: 1px solid #ccc;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+    gap: 10px;
+    word-break: break-all;
+}
+
+.share-link {
+    font-size: 14px;
+    color: #333;
+    background-color: #fff;
+    padding: 8px 12px;
+    border-radius: 6px;
+    border: 1px dashed #999;
+    width: 100%;
+}
+
+.share-btn {
+  width: 80px;
+    align-self: flex-end;
+}

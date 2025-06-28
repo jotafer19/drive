@@ -123,6 +123,39 @@ async function editFolder(userId, folderId, newName) {
   });
 }
 
+async function getSharedLink(sharedLinkId) {
+  return await prisma.shareLink.findFirst({
+    where: {
+      id: sharedLinkId
+    }
+  })
+}
+
+async function postSharedLink(userId, folderId, expiresAt) {
+  return prisma.shareLink.create({
+    data: {
+      userId,
+      folderId,
+      expiresAt
+    }
+  })
+}
+
+async function allowedFolders(userId, rootFolderId, array = []) {
+  const children = await prisma.folder.findMany({
+    where: {
+      userId,
+      parentId: rootFolderId
+    }
+  })
+
+  array.push(...children.map(folder => folder.id))
+
+  await Promise.all(children.map(folder => allowedFolders(userId, folder.id, array)))
+
+  return array;
+}
+
 module.exports = {
   getAllFolders,
   createFolder,
@@ -131,4 +164,7 @@ module.exports = {
   getFolderRoute,
   deleteFolder,
   editFolder,
+  getSharedLink,
+  postSharedLink,
+  allowedFolders
 };
