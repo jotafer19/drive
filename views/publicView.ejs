@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/style/style.css">
     <title>Public View</title>
+    <script src="/script/script.js" defer></script>
 </head>
 <body>
     <%- include("partials/header", { sharedLink: sharedLink.id }) %>
@@ -46,8 +47,8 @@
                         </div>
                     <% }) %>
                 <% } %>
-                <% if (locals.files) { %>
-                    <% locals.files.forEach(file => { %>
+                <% if (files) { %>
+                    <% files.forEach(file => { %>
                         <div class="folder-item">
                                 <div class="folder-info" title="<%= file.name %>">
                                     <a class="folder-link">
@@ -68,7 +69,7 @@
                                     </button>
                                     <ul class="dropdown-menu">
                                         <li class="dropdown-item"><button class="dropdown-option" onclick="showModal({id: '<%= file.id %>', name: '<%= file.name %>', size: '<%= file.size %>', archive: '<%= file.type %>' , createdAt: '<%= file.createdAt %>', updatedAt: '<%= file.updatedAt %>', action: 'info', type: 'file' })">Info</button></li>
-                                        <li class="dropdown-item"><a class="dropdown-option" href="/uploads/file/<%= file.id %>/download">Download</a></li>
+                                        <li class="dropdown-item"><a class="dropdown-option" href="/public/<%= sharedLink.id %>/<%= file.id %>/download">Download</a></li>
                                     </ul>
                                 </div>
                         </div>
