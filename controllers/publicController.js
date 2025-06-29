@@ -77,7 +77,7 @@ exports.publicFolderPost = asyncHandler(async (req, res) => {
 
     const link = await folderQuery.postSharedLink(userId, folderId, expiresAt)
 
-    req.session.sharedLink = `${req.protocol} + '://' + ${req.get('host')}/public/${link.id}`;
+    req.session.sharedLink = `https://mydrive-ju7q.onrender.com/public/${link.id}`;
 
     res.redirect("/uploads/" + (folderId ? folderId : ""));
 })
