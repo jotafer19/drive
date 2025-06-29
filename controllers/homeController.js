@@ -11,7 +11,7 @@ exports.homeGet = asyncHandler(async (req, res) => {
   if (!req.isAuthenticated()) {
     return res.redirect("/");
   }
-
+  
   const currentFolderId = req.params.folderId || null;
 
   const [folders, folderRoute, parentFolder, files] = await Promise.all([

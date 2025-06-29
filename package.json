@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "start": "node app.js --watch",
-    "prettier": "prettier . --write"
+    "prettier": "prettier . --write",
+    "build": "prisma generate && prisma migrate deploy && npm run compile"
   },
   "keywords": [],
   "author": "",

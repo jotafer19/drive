@@ -77,7 +77,7 @@ exports.publicFolderPost = asyncHandler(async (req, res) => {
 
     const link = await folderQuery.postSharedLink(userId, folderId, expiresAt)
 
-    req.session.sharedLink = `http://localhost:3000/public/${link.id}`;
+    req.session.sharedLink = `${req.protocol} + '://' + ${req.get('host')}/public/${link.id}`;
 
     res.redirect("/uploads/" + (folderId ? folderId : ""));
 })

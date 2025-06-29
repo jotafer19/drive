@@ -49,15 +49,6 @@ app.use((req, res, next) => {
   next();
 });
 
-const prisma = new PrismaClient();
-
-const main = async () => {
-  const data = await prisma.user.deleteMany();
-  console.log(data);
-};
-
-main();
-
 app.use("/", loginRouter);
 app.use("/uploads", uploadsRouter);
 app.use("/signup", signupRouter);
